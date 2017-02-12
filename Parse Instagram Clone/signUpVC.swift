@@ -7,29 +7,88 @@
 //
 
 import UIKit
+import Parse
 
 class signUpVC: UIViewController {
 
+    @IBOutlet weak var userNameText: UITextField!
+    
+    
+    @IBOutlet weak var passwordText: UITextField!
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
+        
+        
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    @IBAction func signInButtonClicked(_ sender: Any) {
+        
+        if userNameText.text != "" {
+            if passwordText.text != "" {
+                
+                PFUser.logInWithUsername(inBackground: userNameText.text!, password: passwordText.text!) { (user, error) in
+                    
+                    if error != nil {
+                        
+                        let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+                        let button = UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil)
+                        alert.addAction(button)
+                        self.present(alert, animated: true, completion: nil)
+                        
+                    } else {
+                        
+                        UserDefaults.standard.set(self.userNameText.text!, forKey: "userloggedin")
+                        UserDefaults.standard.synchronize()
+                        
+                        
+                        let delegate : AppDelegate = UIApplication.shared.delegate as! AppDelegate
+                        
+                        delegate.rememberLogin()
+                        
+                        
+                        
+                    }
+                    
+                }
+                
+            }
+        }
+        
+       
+        
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    
+    @IBAction func signUpButtonClicked(_ sender: Any) {
+        
+        let user = PFUser()
+        user.username = userNameText.text
+        user.password = passwordText.text
+        
+        user.signUpInBackground { (success, error) in
+            if error != nil {
+                let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+                let button = UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil)
+                alert.addAction(button)
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                
+                UserDefaults.standard.set(self.userNameText.text!, forKey: "userloggedin")
+                UserDefaults.standard.synchronize()
+                
+                
+                let delegate : AppDelegate = UIApplication.shared.delegate as! AppDelegate
+                
+                delegate.rememberLogin()
+                
+            }
+        }
+    
     }
-    */
-
+    
+    
 }

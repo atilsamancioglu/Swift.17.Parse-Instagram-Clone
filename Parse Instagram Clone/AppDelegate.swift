@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Parse
+import OneSignal
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,6 +18,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+        let config = ParseClientConfiguration { (ParseMutableClientConfiguration) in
+            
+            ParseMutableClientConfiguration.applicationId = "593de549dfd53de6e2cdc4084eda499ec308bf3a"
+            ParseMutableClientConfiguration.clientKey = "6949ced9ca6bbc18e976e366ce0000ec18c1d907"
+            ParseMutableClientConfiguration.server = "http://ec2-52-27-100-128.us-west-2.compute.amazonaws.com:80/parse"
+            
+        }
+        
+
+        Parse.initialize(with: config)
+        
+        let defaultACL = PFACL()
+        
+        defaultACL.getPublicReadAccess = true
+        defaultACL.getPublicWriteAccess = true
+        
+        PFACL.setDefault(defaultACL, withAccessForCurrentUser: true)
+        
+        
+        //push notification configuration
+        
+        OneSignal.initWithLaunchOptions(launchOptions, appId: "1e58f122-5910-4c94-a635-47a63edbf4fa")
+        
+        rememberLogin()
+        
         return true
     }
 
@@ -41,6 +69,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
+    
+    func rememberLogin() {
+        
+        let user : String? = UserDefaults.standard.string(forKey: "userloggedin")
+        
+        if user != nil {
+            
+            let board : UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            
+            let tabBar = board.instantiateViewController(withIdentifier: "tabBar") as! UITabBarController
+            
+            window?.rootViewController = tabBar
+            
+            
+        }
+        
+    }
 
 }
 
